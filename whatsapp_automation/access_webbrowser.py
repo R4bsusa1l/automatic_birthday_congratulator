@@ -1,9 +1,7 @@
-import webbrowser
-import pyautogui
-import time
 from datetime import date
 from config import load_database_config
 from connect import connect
+from whatsapp_automation import activateWhatsapp 
 
 def main():
     evaluateBirthdayRecipients()
@@ -28,11 +26,10 @@ def evaluateBirthdayRecipients():
     todaysday = today.day
     todaysmonth = today.month
     with conn.cursor() as cursor:
-        sql3 = 'SELECT recipientsid, firstname, Lastname, userkey, birthyear, phonenumber FROM recipients WHERE birthday = %s and birthmonth = %s;'
+        sql3 = 'SELECT recipientsid, firstname, birthyear, phonenumber FROM recipients WHERE birthday = %s and birthmonth = %s;'
         cursor.execute(sql3, (todaysday, todaysmonth))
         birthdayRecipients = cursor.fetchall()
-        for (recipientsId, firstName, LastName, userKey, birthyear, phonenumber) in birthdayRecipients:
-            print('found: '.join(recipientsId))
+        for (recipientsId, firstName, birthyear, phonenumber) in birthdayRecipients:
             sql1 = 'SELECT messagekey FROM recipient_message WHERE recipientkey = %s'
             cursor.execute(sql1, (recipientsId,))
             previouslyUsedMessages = cursor.fetchall()
@@ -40,61 +37,24 @@ def evaluateBirthdayRecipients():
             usedmessages = [messageKey[0] for messageKey in previouslyUsedMessages]
             if usedmessages:
                 placeholders = ', '.join(['%s'] * len(usedmessages))
-                sql2 = f'SELECT birthdaymessage FROM birhtday_messages WHERE messageid NOT IN ({placeholders})'
+                sql2 = f'SELECT birthdaymessage FROM birthday_messages WHERE messageid NOT IN ({placeholders}) LIMIT 1'
                 cursor.execute(sql2, usedmessages)
             else:
-                sql2 = 'SELECT birthdaymessage FROM birhtday_messages'
+                sql2 = 'SELECT birthdaymessage FROM birthday_messages LIMIT 1'
                 cursor.execute(sql2)
-            birthdayMessage = cursor.fetchall()
-            cleanedbirthdaymessage = retrieveWorkableBirthdayMessage(firstName, LastName, today.year - birthyear, birthdayMessage)
-            activateWhatsapp(phonenumber, firstName, LastName, cleanedbirthdaymessage)
+            result = cursor.fetchone()
+            if result:
+                birthdayMessage = result[0]
+                cleanedbirthdaymessage = retrieveWorkableBirthdayMessage(firstName, today.year - birthyear, birthdayMessage)
+                activateWhatsapp(phonenumber, cleanedbirthdaymessage)
+            
 
-def retrieveWorkableBirthdayMessage(firstname, lastname, age, birthdaymessage):
-    birthdaymessage.replace('PersonX', firstname)
+def retrieveWorkableBirthdayMessage(firstname, age, birthdaymessage):
+    birthdaymessage = birthdaymessage.replace('PersonX', firstname)
     if abs(age) % 10 == 3:
-        birthdaymessage.replace('??th', '??nd')
-    birthdaymessage.replace('??', age)
+        birthdaymessage = birthdaymessage.replace('??th', '??nd')
+    birthdaymessage = birthdaymessage.replace('??', str(age))
     return birthdaymessage
     
-
-
-def activateWhatsapp(phonenumber, firstName, LastName, birthdayMessage):
-    print('Opening Whatsapp')
-    site = "https://web.whatsapp.com/"
-
-    try:
-        webbrowser.open_new_tab(site.strip())
-    except Exception as e:
-        print(e)
-
-    # Wait for the browser to open
-    time.sleep(5)
-
-    # Find the browser window (adjust title as needed)
-    windows = pyautogui.getWindowsWithTitle("WhatsApp") #Adjust this title if needed.
-    print (windows)
-    if windows:
-        window = windows[0]  # Get the first window matching the title
-        window.activate()  # Bring the window to the foreground
-
-        # Resize and position the window
-        window.resizeTo(800, 800) # example size. adjust as needed.
-        window.moveTo(0, 0) # move to top left.
-
-        # Wait for the window to resize and move
-        time.sleep(2)
-
-    pyautogui.mouseInfo()
-    pyautogui.click(345, 120)  # Move the mouse to "open new chat". 
-    pyautogui.click(150, 175)   # Move the mouse to "search for contact".
-    pyautogui.write(phonenumber, interval=0.25) # type name of recipient (must match exactly given name in contacts/Whatsapp)           // might work with phone number as well
-    pyautogui.click(230, 350)   # Move the mouse to select the entered contact.
-    pyautogui.click(170, 310)   # Move the mouse to select the entered contact. click again for confirmation
-    pyautogui.click(100, 300)   # Move the mouse to select the entered contact. click again for double confirmation
-    pyautogui.click(550, 760)   # Move the mouse to the text box for String entry.
-    pyautogui.write(birthdayMessage, interval=0.25) # type birthday message
-    pyautogui.click(750, 760)   # Move the mouse to the text box for String entry.
-
-    window.close()
 
 if __name__ == '__main__': main()
