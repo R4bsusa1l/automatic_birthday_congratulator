@@ -1,8 +1,10 @@
 package com.automatic_birthday_congratulator.sample
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,26 +32,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.automatic_birthday_congratulator.sample.services.WhatsappAccessibilityService
 import com.automatic_birthday_congratulator.sample.ui.theme.MyApplicationTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             MyApplicationTheme {
-                MainScreen()
+                val context = LocalContext.current
+                enableAccessibilityService(context)
+                MainScreen(context)
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(context: Context) {
+
     var phoneNumber by remember { mutableStateOf(TextFieldValue("")) }
     var message by remember { mutableStateOf(TextFieldValue("")) }
-    val context = LocalContext.current
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -93,9 +99,12 @@ fun MainScreen() {
                 val number = phoneNumber.text
                 val text = message.text
                 if (number.isNotEmpty() && text.isNotEmpty()) {
+
                     val intent = Intent(Intent.ACTION_VIEW)
                     val uri = "https://api.whatsapp.com/send?phone=$number&text=$text"
                     intent.data = Uri.parse(uri)
+
+
                     try {
                         context.startActivity(intent)
                     } catch (e: Exception) {
@@ -123,6 +132,14 @@ fun MainScreen() {
 @Composable
 fun MainScreenPreview() {
     MyApplicationTheme {
-        MainScreen()
+        MainScreen(context = LocalContext.current)
+    }
+}
+
+fun enableAccessibilityService(context: Context){
+    val accessibilityCheck = AccessibilityCheck();
+    if (!accessibilityCheck.isAccessibilityOn(context, WhatsappAccessibilityService::class.java)) {
+        val intent2: Intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        context.startActivity(intent2)
     }
 }
