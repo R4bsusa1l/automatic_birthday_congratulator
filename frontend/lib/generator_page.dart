@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:automatic_birthday_congratulator/app_state.dart';
-import 'package:automatic_birthday_congratulator/card_display.dart';
+import 'package:automatic_birthday_congratulator/display_carousel.dart';
 
 class GeneratorPage extends StatelessWidget {
   @override
@@ -20,7 +20,7 @@ class GeneratorPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CardDisplay(pair: pair),
+          CarouselDisplay(),
           SizedBox(height: 10),
           Row(
             mainAxisSize: MainAxisSize.min,
