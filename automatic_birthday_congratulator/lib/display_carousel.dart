@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart' as carousel_slider;
+import 'package:overlapped_carousel/overlapped_carousel.dart';
+import 'dart:math';
 
 class CarouselDisplay extends StatelessWidget {
   @override
@@ -8,64 +9,42 @@ class CarouselDisplay extends StatelessWidget {
     final style = theme.textTheme.displayMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
     );
+    var screenWidth = MediaQuery.of(context).size.width;
+    var screenHeight = MediaQuery.of(context).size.height;
 
     final double height = MediaQuery.of(context).size.height;
 
     return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: height / 2),
-        child: carousel_slider.CarouselSlider.builder(
-          options: carousel_slider.CarouselOptions(
-            height: 400, // Height of the carousel
-            autoPlay: false, // Disable auto-scrolling
-            enlargeCenterPage: true, // Enlarge the center card
-            viewportFraction: 0.6, // Fraction of the viewport each card takes
-            enableInfiniteScroll: true, // Enable infinite scrolling
-            scrollPhysics: BouncingScrollPhysics(), // Smooth scrolling
+      child: Container(
+        color: style.color,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: height / 2),
+          child: SizedBox(
+            height: min(screenWidth / 3.3 * (16 / 9), screenHeight * .9),
+            child: OverlappedCarousel(
+              widgets: [
+                ...List<Widget>.generate(10, (int index) {
+                  return Card(
+                    color: Colors.primaries[index % Colors.primaries.length],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Center(child: Text('Item $index', style: style)),
+                  );
+                }),
+              ],
+              currentIndex: 2,
+              onClicked: (index) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("You clicked at $index")),
+                );
+              },
+              // To obscure or blur cards not in focus use the obscure parameter.
+              obscure: 0.1,
+              // To control skew angle
+              skewAngle: 0.2,
+            ),
           ),
-          itemCount: 10, // Number of cards
-          itemBuilder: (context, index, realIndex) {
-            return Transform.scale(
-              scale: realIndex == index ? 1.0 : 0.8, // Scale background cards
-              child: Opacity(
-                opacity:
-                    realIndex == index ? 1.0 : 0.5, // Fade background cards
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.card_giftcard,
-                        size: 64,
-                        color: theme.colorScheme.onPrimary,
-                      ),
-                      SizedBox(height: 16),
-                      Text('Card $index', style: style),
-                      SizedBox(height: 8),
-                      Text(
-                        'Additional Info',
-                        style: theme.textTheme.bodyMedium!.copyWith(
-                          color: theme.colorScheme.onPrimary.withOpacity(0.8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
         ),
       ),
     );
