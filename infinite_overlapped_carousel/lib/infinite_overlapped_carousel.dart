@@ -1,37 +1,40 @@
-library overlapped_carousel;
+library;
 
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import 'card.dart';
 
-class OverlappedCarousel extends StatefulWidget {
+class InfiniteOverlappedCarousel extends StatefulWidget {
   final List<Widget> widgets;
   final Function(int) onClicked;
   final int? currentIndex;
   final double obscure;
   final double skewAngle;
 
-  OverlappedCarousel({
+  const InfiniteOverlappedCarousel({
+    super.key,
     required this.widgets,
     required this.onClicked,
     this.currentIndex,
     this.obscure = 0,
-    this.skewAngle = -0.25
+    this.skewAngle = -0.25,
   });
 
   @override
-  _OverlappedCarouselState createState() => _OverlappedCarouselState();
+  InfiniteOverlappedCarouselState createState() =>
+      InfiniteOverlappedCarouselState();
 }
 
-class _OverlappedCarouselState extends State<OverlappedCarousel> {
+class InfiniteOverlappedCarouselState
+    extends State<InfiniteOverlappedCarousel> {
   double currentIndex = 2;
 
   @override
   void initState() {
-    if (widget.currentIndex != null)
+    if (widget.currentIndex != null) {
       currentIndex = widget.currentIndex!.toDouble();
+    }
     super.initState();
   }
 
@@ -45,8 +48,9 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
             onPanUpdate: (details) {
               setState(() {
                 var indx = currentIndex - details.delta.dx * 0.02;
-                if (indx >= 1 && indx <= widget.widgets.length - 3)
+                if (indx >= 1 && indx <= widget.widgets.length - 3) {
                   currentIndex = indx;
+                }
               });
             },
             onPanEnd: (details) {
@@ -57,10 +61,7 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
             child: OverlappedCarouselCardItems(
               cards: List.generate(
                 widget.widgets.length,
-                (index) => CardModel(
-                  id: index,
-                  child: widget.widgets[index],
-                ),
+                (index) => CardModel(id: index, child: widget.widgets[index]),
               ),
               centerIndex: currentIndex,
               maxWidth: constraints.maxWidth,
@@ -85,7 +86,8 @@ class OverlappedCarouselCardItems extends StatelessWidget {
   final double obscure;
   final double skewAngle;
 
-  OverlappedCarouselCardItems({
+  const OverlappedCarouselCardItems({
+    super.key,
     required this.cards,
     required this.centerIndex,
     required this.maxHeight,
@@ -153,11 +155,12 @@ class OverlappedCarouselCardItems extends StatelessWidget {
   Matrix4 getTransform(int index) {
     final distance = centerIndex - index;
 
-    var transform = Matrix4.identity()
-      ..setEntry(3, 2, 0.007)
-      ..rotateY(skewAngle * distance)
-      ..scale(1.25, 1.25, 1.25);
-    if (index == centerIndex) transform..scale(1.05, 1.05, 1.05);
+    var transform =
+        Matrix4.identity()
+          ..setEntry(3, 2, 0.007)
+          ..rotateY(skewAngle * distance)
+          ..scale(1.25, 1.25, 1.25);
+    if (index == centerIndex) transform.scale(1.05, 1.05, 1.05);
     return transform;
   }
 
@@ -181,26 +184,29 @@ class OverlappedCarouselCardItems extends StatelessWidget {
               height: height > 0 ? height : 0,
               child: item.child,
             ),
-              Container(
-                width: width.toDouble(),
-                padding: EdgeInsets.symmetric(vertical: verticalPadding),
-                height: height > 0 ? height : 0,
-                child: ClipRRect(
-                  child: BackdropFilter(
-                    filter: getFilter(obscure, index),
-                    child: Container(),
-                  ),
+            Container(
+              width: width.toDouble(),
+              padding: EdgeInsets.symmetric(vertical: verticalPadding),
+              height: height > 0 ? height : 0,
+              child: ClipRRect(
+                child: BackdropFilter(
+                  filter: getFilter(obscure, index),
+                  child: Container(),
                 ),
               ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  ImageFilter getFilter(double obscure, int index){
+  ImageFilter getFilter(double obscure, int index) {
     final distance = (centerIndex - index).abs();
-    return ImageFilter.blur(sigmaX: 5.0*obscure*distance, sigmaY: 5.0*obscure*distance);
+    return ImageFilter.blur(
+      sigmaX: 5.0 * obscure * distance,
+      sigmaY: 5.0 * obscure * distance,
+    );
   }
 
   List<Widget> _sortedStackWidgets(List<CardModel> widgets) {
@@ -217,10 +223,11 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     widgets.sort((a, b) => a.zIndex.compareTo(b.zIndex));
     return widgets.map((e) {
       double distance = (centerIndex - e.id).abs();
-      if (distance >= 0 && distance <= 3)
+      if (distance >= 0 && distance <= 3) {
         return _buildItem(e);
-      else
+      } else {
         return Container();
+      }
     }).toList();
   }
 
