@@ -111,77 +111,118 @@ class OverlappedCarouselCardItems extends StatelessWidget {
 
     final double verticalCenter = maxHeight / 2;
     final double centerWidgetHeight = maxHeight / 2.5;
-    final double verticalBasePosition = (verticalCenter - centerWidgetHeight) / 8;
+    final double verticalBasePosition =
+        (verticalCenter - centerWidgetHeight) / 8;
 
-    final double factor = 3.75;    // make smaller for steeper incline
-
+    const double factor = 4.75; // make smaller for steeper incline
 
     if (distance == 0) {
       return (
-        left : basePosition,
-        bottom : verticalBasePosition,
+        left: basePosition,
+        bottom: verticalBasePosition,
       );
     } else if (distance.abs() > 0.0 && distance.abs() <= 1.0) {
       if (distance > 0) {
         return (
-          left : basePosition - nearWidgetWidth * distance.abs(),
-          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: basePosition - nearWidgetWidth * distance.abs(),
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       } else {
         return (
-          left : maxWidth - (basePosition - nearWidgetWidth * distance.abs()) - nearWidgetWidth -16,
-          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth -
+              (basePosition - nearWidgetWidth * distance.abs()) -
+              nearWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
     } else if (distance.abs() >= 1.0 && distance.abs() <= 2.0) {
       if (distance > 0) {
         return (
-          left : basePosition - nearWidgetWidth -
+          left: basePosition -
+              nearWidgetWidth -
               (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1),
-          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       } else {
         return (
-          left : maxWidth - (basePosition - nearWidgetWidth - (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1)) - farWidgetWidth - 16,
-          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth -
+              (basePosition -
+                  nearWidgetWidth -
+                  (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1)) -
+              farWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
     } else if (distance.abs() > 2.0 && distance.abs() <= 3.0) {
       if (distance > 0) {
         return (
-          left: basePosition - nearWidgetWidth + (farBackWidgetWidth - centerBackWidgetWidth) * (distance.abs() - 2),
-          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: basePosition -
+              nearWidgetWidth +
+              (farBackWidgetWidth - centerBackWidgetWidth) *
+                  (distance.abs() - 2),
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       } else {
         return (
-          left: maxWidth - (basePosition - nearWidgetWidth + (farWidgetWidth - nearBackWidgetWidth) * (distance.abs() - 2)) - nearBackWidgetWidth - 16,
-          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth -
+              (basePosition -
+                  nearWidgetWidth +
+                  (farWidgetWidth - nearBackWidgetWidth) *
+                      (distance.abs() - 2)) -
+              nearBackWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
-    } else if (distance.abs() > 3.0 && distance.abs() <= 4.0){
-      if (distance > 0){
+    } else if (distance.abs() > 3.0 && distance.abs() <= 4.0) {
+      if (distance > 0) {
         return (
-          left: basePosition - nearWidgetWidth + (nearWidgetWidth / 2) * (distance.abs() - 3),
-          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: basePosition -
+              nearWidgetWidth +
+              (nearWidgetWidth / 2) * (distance.abs() - 3),
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
-      }else{
+      } else {
         return (
-          left: maxWidth - (basePosition - nearWidgetWidth + (nearWidgetWidth / 2) * (distance.abs() - 3)) - farWidgetWidth - 16,
-          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth -
+              (basePosition -
+                  nearWidgetWidth +
+                  (nearWidgetWidth / 2) * (distance.abs() - 3)) -
+              farWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
-    }else{
-        if (distance > 0){
-          return (
-            left: basePosition + ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4),
-            bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
-          );
-        }else{
-          return (
-            left: maxWidth - (basePosition + ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4)) - farWidgetWidth - 16,
-            bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
-          );
-        }
+    } else {
+      if (distance > 0) {
+        return (
+          left: basePosition +
+              ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4),
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
+        );
+      } else {
+        return (
+          left: maxWidth -
+              (basePosition +
+                  ((centerWidgetWidth - farWidgetWidth) / 2) *
+                      (distance.abs() - 4)) -
+              farWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
+        );
+      }
     }
   }
 
@@ -212,28 +253,27 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     return Positioned(
       left: position.left,
       bottom: position.bottom,
-      
-        child: Stack(
-          children: [
-            Container(
-              width: width.toDouble(),
-              padding: EdgeInsets.symmetric(vertical: verticalPadding),
-              height: height > 0 ? height : 0,
-              child: item.child,
-            ),
-            Container(
-              width: width.toDouble(),
-              padding: EdgeInsets.symmetric(vertical: verticalPadding),
-              height: height > 0 ? height : 0,
-              child: ClipRRect(
-                child: BackdropFilter(
-                  filter: getFilter(obscure, index),
-                  child: Container(),
-                ),
+      child: Stack(
+        children: [
+          Container(
+            width: width.toDouble(),
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            height: height > 0 ? height : 0,
+            child: item.child,
+          ),
+          Container(
+            width: width.toDouble(),
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            height: height > 0 ? height : 0,
+            child: ClipRRect(
+              child: BackdropFilter(
+                filter: getFilter(obscure, index),
+                child: Container(),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -247,15 +287,19 @@ class OverlappedCarouselCardItems extends StatelessWidget {
 
   List<Widget> _sortedStackWidgets(List<CardModel> widgets) {
     for (int i = 0; i < widgets.length; i++) {
+      double distance = (centerIndex - widgets[i].id).abs();
+
       if (widgets[i].id == centerIndex) {
-        widgets[i].zIndex = widgets.length.toDouble();
-      } else if (widgets[i].id < centerIndex) {
-        widgets[i].zIndex = widgets[i].id.toDouble();
+        widgets[i].zIndex = widgets.length.toDouble() - distance;
       } else {
-        widgets[i].zIndex =
-            widgets.length.toDouble() - widgets[i].id.toDouble();
+        if (distance > 0) {
+          widgets[i].zIndex = widgets.length.toDouble() - distance - 1;
+        } else {
+          widgets[i].zIndex = widgets.length.toDouble() - distance;
+        }
       }
     }
+
     widgets.sort((a, b) => a.zIndex.compareTo(b.zIndex));
     return widgets.map((e) {
       double distance = (centerIndex - e.id).abs();
