@@ -47,15 +47,25 @@ class InfiniteOverlappedCarouselState
           return GestureDetector(
             onPanUpdate: (details) {
               setState(() {
-                var indx = currentIndex - details.delta.dx * 0.02;
-                if (indx >= 1 && indx <= widget.widgets.length - 3) {
-                  currentIndex = indx;
+                currentIndex -= details.delta.dx * 0.02;
+                if (currentIndex < 0) {
+                  currentIndex += widget.widgets.length;
+                } else if (currentIndex >= widget.widgets.length) {
+                  currentIndex -= widget.widgets.length;
                 }
               });
             },
             onPanEnd: (details) {
               setState(() {
-                currentIndex = currentIndex.ceil().toDouble();
+                // Snap to the nearest integer index
+                currentIndex = currentIndex.roundToDouble();
+
+                // Wrap around logic for snapping
+                if (currentIndex < 0) {
+                  currentIndex += widget.widgets.length;
+                } else if (currentIndex >= widget.widgets.length) {
+                  currentIndex -= widget.widgets.length;
+                }
               });
             },
             child: OverlappedCarouselCardItems(
@@ -101,7 +111,23 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     final double center = maxWidth / 2;
     final double centerWidgetWidth = maxWidth / 4;
     final double basePosition = center - centerWidgetWidth / 2;
-    final distance = centerIndex - index;
+    // does not work if centerIndex (currentPosition) is 9 and index to be displayed is 0. -> distance = 9
+    // does not work if centerIndex (currentPosition) is 0 and index to be displayed is 9. -> distance = -9
+    
+    // Calculate the raw distance
+    double rawDistance = index - centerIndex;
+
+    // Calculate the shortest distance considering the wrap-around
+    double distance = rawDistance % cards.length;
+    
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
+    
+
+     
 
     final double nearWidgetWidth = centerWidgetWidth / 5 * 4;
     final double farWidgetWidth = centerWidgetWidth / 5 * 3;
@@ -111,204 +137,195 @@ class OverlappedCarouselCardItems extends StatelessWidget {
 
     final double verticalCenter = maxHeight / 2;
     final double centerWidgetHeight = maxHeight / 2.5;
-    final double verticalBasePosition =
-        (verticalCenter - centerWidgetHeight) / 8;
+    final double verticalBasePosition = (verticalCenter - centerWidgetHeight) / 8;
 
-    const double factor = 4.75; // make smaller for steeper incline
+    final double factor = 4.75;    // make smaller for steeper incline
+
 
     if (distance == 0) {
       return (
-        left: basePosition,
-        bottom: verticalBasePosition,
+        left : basePosition,
+        bottom : verticalBasePosition,
       );
     } else if (distance.abs() > 0.0 && distance.abs() <= 1.0) {
       if (distance > 0) {
         return (
-          left: basePosition - nearWidgetWidth * distance.abs(),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
+          left : basePosition - nearWidgetWidth * distance.abs(),
+          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
         );
       } else {
         return (
-          left: maxWidth -
-              (basePosition - nearWidgetWidth * distance.abs()) -
-              nearWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
+          left : maxWidth - (basePosition - nearWidgetWidth * distance.abs()) - nearWidgetWidth -16,
+          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
     } else if (distance.abs() >= 1.0 && distance.abs() <= 2.0) {
       if (distance > 0) {
         return (
-          left: basePosition -
-              nearWidgetWidth -
+          left : basePosition - nearWidgetWidth -
               (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
+          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
         );
       } else {
         return (
-          left: maxWidth -
-              (basePosition -
-                  nearWidgetWidth -
-                  (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1)) -
-              farWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
+          left : maxWidth - (basePosition - nearWidgetWidth - (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1)) - farWidgetWidth - 16,
+          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
     } else if (distance.abs() > 2.0 && distance.abs() <= 3.0) {
       if (distance > 0) {
         return (
-          left: basePosition -
-              nearWidgetWidth +
-              (farBackWidgetWidth - centerBackWidgetWidth) *
-                  (distance.abs() - 2),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
+          left: basePosition - nearWidgetWidth + (farBackWidgetWidth - centerBackWidgetWidth) * (distance.abs() - 2),
+          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
         );
       } else {
         return (
-          left: maxWidth -
-              (basePosition -
-                  nearWidgetWidth +
-                  (farWidgetWidth - nearBackWidgetWidth) *
-                      (distance.abs() - 2)) -
-              nearBackWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth - (basePosition - nearWidgetWidth + (farWidgetWidth - nearBackWidgetWidth) * (distance.abs() - 2)) - nearBackWidgetWidth - 16,
+          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
-    } else if (distance.abs() > 3.0 && distance.abs() <= 4.0) {
-      if (distance > 0) {
+    } else if (distance.abs() > 3.0 && distance.abs() <= 4.0){
+      if (distance > 0){
         return (
-          left: basePosition -
-              nearWidgetWidth +
-              (nearWidgetWidth / 2) * (distance.abs() - 3),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
+          left: basePosition - nearWidgetWidth + (nearWidgetWidth / 2) * (distance.abs() - 3),
+          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
         );
-      } else {
+      }else{
         return (
-          left: maxWidth -
-              (basePosition -
-                  nearWidgetWidth +
-                  (nearWidgetWidth / 2) * (distance.abs() - 3)) -
-              farWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth - (basePosition - nearWidgetWidth + (nearWidgetWidth / 2) * (distance.abs() - 3)) - farWidgetWidth - 16,
+          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
-    } else {
-      if (distance > 0) {
-        return (
-          left: basePosition +
-              ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      } else {
-        return (
-          left: maxWidth -
-              (basePosition +
-                  ((centerWidgetWidth - farWidgetWidth) / 2) *
-                      (distance.abs() - 4)) -
-              farWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      }
+    }else{
+        if (distance > 0){
+          return (
+            left: basePosition + ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4),
+            bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          );
+        }else{
+          return (
+            left: maxWidth - (basePosition + ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4)) - farWidgetWidth - 16,
+            bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          );
+        }
     }
   }
 
-  double getCardWidth(int index) {
-    final double distance = (centerIndex - index).abs();
-    final double centerWidgetWidth = maxWidth / 3.5;
-    final double nearWidgetWidth = centerWidgetWidth / 5 * 4.5;
-    final double farWidgetWidth = centerWidgetWidth / 5 * 3.5;
+double getCardWidth(int index) {
+  final double centerWidgetWidth = maxWidth / 3.5;
+  final double nearWidgetWidth = centerWidgetWidth / 5 * 4.5;
+  final double farWidgetWidth = centerWidgetWidth / 5 * 3.5;
 
-    if (distance >= 0.0 && distance < 1.0) {
-      return centerWidgetWidth -
-          (centerWidgetWidth - nearWidgetWidth) * (distance - distance.floor());
-    } else if (distance >= 1.0 && distance < 2.0) {
-      return nearWidgetWidth -
-          (nearWidgetWidth - farWidgetWidth) * (distance - distance.floor());
-    } else {
-      return farWidgetWidth;
-    }
+  // Calculate the raw distance
+  double rawDistance = centerIndex - index;
+
+  // Calculate the shortest distance considering the wrap-around
+  double distance = rawDistance % cards.length;
+
+  if (distance > cards.length / 2) {
+    distance -= cards.length;
+  } else if (distance <= -cards.length / 2) {
+    distance += cards.length;
   }
+
+  final double absDistance = distance.abs(); // Use the absolute shortest distance
+
+  if (absDistance >= 0.0 && absDistance < 1.0) {
+    return centerWidgetWidth -
+        (centerWidgetWidth - nearWidgetWidth) * (absDistance - absDistance.floor());
+  } else if (absDistance >= 1.0 && absDistance < 2.0) {
+    return nearWidgetWidth -
+        (nearWidgetWidth - farWidgetWidth) * (absDistance - absDistance.floor());
+  } else {
+    return farWidgetWidth;
+  }
+}
 
   Widget _buildItem(CardModel item) {
     final int index = item.id;
     final width = getCardWidth(index);
-    final height = maxHeight - 20 * (centerIndex - index).abs();
+    final height = maxHeight - 20 * (getCircularDistance(index)).abs();
     final position = getCardPosition(index);
-    final verticalPadding = width * 0.05 * (centerIndex - index).abs();
+    final verticalPadding = width * 0.05 * (getCircularDistance(index)).abs();
 
     return Positioned(
       left: position.left,
       bottom: position.bottom,
-      child: Stack(
-        children: [
-          Container(
-            width: width.toDouble(),
-            padding: EdgeInsets.symmetric(vertical: verticalPadding),
-            height: height > 0 ? height : 0,
-            child: item.child,
-          ),
-          Container(
-            width: width.toDouble(),
-            padding: EdgeInsets.symmetric(vertical: verticalPadding),
-            height: height > 0 ? height : 0,
-            child: ClipRRect(
-              child: BackdropFilter(
-                filter: getFilter(obscure, index),
-                child: Container(),
+      
+        child: Stack(
+          children: [
+            Container(
+              width: width.toDouble(),
+              padding: EdgeInsets.symmetric(vertical: verticalPadding),
+              height: height > 0 ? height : 0,
+              child: item.child,
+            ),
+            Container(
+              width: width.toDouble(),
+              padding: EdgeInsets.symmetric(vertical: verticalPadding),
+              height: height > 0 ? height : 0,
+              child: ClipRRect(
+                child: BackdropFilter(
+                  filter: getFilter(obscure, index),
+                  child: Container(),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  ImageFilter getFilter(double obscure, int index) {
-    final distance = (centerIndex - index).abs();
-    return ImageFilter.blur(
-      sigmaX: 5.0 * obscure * distance,
-      sigmaY: 5.0 * obscure * distance,
+          ],
+        ),
     );
   }
 
   List<Widget> _sortedStackWidgets(List<CardModel> widgets) {
     for (int i = 0; i < widgets.length; i++) {
-      double distance = (centerIndex - widgets[i].id).abs();
+      // Calculate the raw distance
+      double rawDistance = centerIndex - widgets[i].id;
 
-      if (widgets[i].id == centerIndex) {
-        widgets[i].zIndex = widgets.length.toDouble() - distance;
+      // Calculate the shortest distance considering the wrap-around
+      double distance = rawDistance % cards.length;
+
+      if (distance > cards.length / 2) {
+        distance -= cards.length;
+      } else if (distance <= -cards.length / 2) {
+        distance += cards.length;
+      }
+
+      widgets[i].wrappedDistance = distance.abs(); // Store the wrapped absolute distance
+
+      if (widgets[i].id == centerIndex.round()) { // Use rounded centerIndex for comparison
+        widgets[i].zIndex = widgets.length.toDouble() - widgets[i].wrappedDistance;
       } else {
-        if (distance > 0) {
-          widgets[i].zIndex = widgets.length.toDouble() - distance - 1;
-        } else {
-          widgets[i].zIndex = widgets.length.toDouble() - distance;
-        }
+        widgets[i].zIndex = widgets.length.toDouble() - widgets[i].wrappedDistance - 1;
       }
     }
 
     widgets.sort((a, b) => a.zIndex.compareTo(b.zIndex));
     return widgets.map((e) {
-      double distance = (centerIndex - e.id).abs();
-      if (distance >= 0 && distance <= 5) {
+      // Use the stored wrapped absolute distance for filtering
+      if (e.wrappedDistance >= 0 && e.wrappedDistance <= 5) {
         return _buildItem(e);
       } else {
         return Container();
       }
     }).toList();
+  }
+
+  ImageFilter getFilter(double obscure, int index) {
+        // Calculate the raw distance
+    double rawDistance = (centerIndex - index).abs();
+
+    // Calculate the shortest distance considering the wrap-around
+    double distance = rawDistance % cards.length;
+    
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
+    return ImageFilter.blur(
+      sigmaX: 5.0 * obscure * distance,
+      sigmaY: 5.0 * obscure * distance,
+    );
   }
 
   @override
@@ -320,5 +337,21 @@ class OverlappedCarouselCardItems extends StatelessWidget {
         children: _sortedStackWidgets(cards),
       ),
     );
+  }
+
+  double getCircularDistance(int index){
+      // Calculate the raw distance
+    double rawDistance = (centerIndex - index).abs();
+            
+    // Calculate the shortest distance considering the wrap-around
+    double distance = rawDistance % cards.length;
+    
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
+    return distance;
+
   }
 }

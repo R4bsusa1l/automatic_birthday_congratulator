@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
           height: min(screenWidth / 3.3 * (16 / 9), screenHeight * .9),
           child: InfiniteOverlappedCarousel(
             widgets: widgets, //List of widgets
-            currentIndex: 2,
+            currentIndex: widgets.length ~/ 2, //Current index of the carousel
             onClicked: (index) {
               ScaffoldMessenger.of(
                 context,
