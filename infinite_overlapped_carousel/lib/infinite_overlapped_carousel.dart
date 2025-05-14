@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'card.dart';
+import 'dart:math' as math;
 
 class InfiniteOverlappedCarousel extends StatefulWidget {
   final List<Widget> widgets;
@@ -113,21 +114,18 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     final double basePosition = center - centerWidgetWidth / 2;
     // does not work if centerIndex (currentPosition) is 9 and index to be displayed is 0. -> distance = 9
     // does not work if centerIndex (currentPosition) is 0 and index to be displayed is 9. -> distance = -9
-    
+
     // Calculate the raw distance
     double rawDistance = index - centerIndex;
 
     // Calculate the shortest distance considering the wrap-around
     double distance = rawDistance % cards.length;
-    
+
     if (distance > cards.length / 2) {
       distance -= cards.length;
     } else if (distance <= -cards.length / 2) {
       distance += cards.length;
     }
-    
-
-     
 
     final double nearWidgetWidth = centerWidgetWidth / 5 * 4;
     final double farWidgetWidth = centerWidgetWidth / 5 * 3;
@@ -137,142 +135,319 @@ class OverlappedCarouselCardItems extends StatelessWidget {
 
     final double verticalCenter = maxHeight / 2;
     final double centerWidgetHeight = maxHeight / 2.5;
-    final double verticalBasePosition = (verticalCenter - centerWidgetHeight) / 8;
+    final double verticalBasePosition =
+        (verticalCenter - centerWidgetHeight) / 8;
 
-    final double factor = 4.75;    // make smaller for steeper incline
-
+    final double factor = 4.75; // make smaller for steeper incline
 
     if (distance == 0) {
       return (
-        left : basePosition,
-        bottom : verticalBasePosition,
+        left: basePosition,
+        bottom: verticalBasePosition,
       );
     } else if (distance.abs() > 0.0 && distance.abs() <= 1.0) {
       if (distance > 0) {
         return (
-          left : basePosition - nearWidgetWidth * distance.abs(),
-          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: basePosition - nearWidgetWidth * distance.abs(),
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       } else {
         return (
-          left : maxWidth - (basePosition - nearWidgetWidth * distance.abs()) - nearWidgetWidth -16,
-          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth -
+              (basePosition - nearWidgetWidth * distance.abs()) -
+              nearWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
     } else if (distance.abs() >= 1.0 && distance.abs() <= 2.0) {
       if (distance > 0) {
         return (
-          left : basePosition - nearWidgetWidth -
+          left: basePosition -
+              nearWidgetWidth -
               (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1),
-          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       } else {
         return (
-          left : maxWidth - (basePosition - nearWidgetWidth - (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1)) - farWidgetWidth - 16,
-          bottom : verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth -
+              (basePosition -
+                  nearWidgetWidth -
+                  (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1)) -
+              farWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
     } else if (distance.abs() > 2.0 && distance.abs() <= 3.0) {
       if (distance > 0) {
         return (
-          left: basePosition - nearWidgetWidth + (farBackWidgetWidth - centerBackWidgetWidth) * (distance.abs() - 2),
-          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: basePosition -
+              nearWidgetWidth +
+              (farBackWidgetWidth - centerBackWidgetWidth) *
+                  (distance.abs() - 2),
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       } else {
         return (
-          left: maxWidth - (basePosition - nearWidgetWidth + (farWidgetWidth - nearBackWidgetWidth) * (distance.abs() - 2)) - nearBackWidgetWidth - 16,
-          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth -
+              (basePosition -
+                  nearWidgetWidth +
+                  (farWidgetWidth - nearBackWidgetWidth) *
+                      (distance.abs() - 2)) -
+              nearBackWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
-    } else if (distance.abs() > 3.0 && distance.abs() <= 4.0){
-      if (distance > 0){
+    } else if (distance.abs() > 3.0 && distance.abs() <= 4.0) {
+      if (distance > 0) {
         return (
-          left: basePosition - nearWidgetWidth + (nearWidgetWidth / 2) * (distance.abs() - 3),
-          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: basePosition -
+              nearWidgetWidth +
+              (nearWidgetWidth / 2) * (distance.abs() - 3),
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
-      }else{
+      } else {
         return (
-          left: maxWidth - (basePosition - nearWidgetWidth + (nearWidgetWidth / 2) * (distance.abs() - 3)) - farWidgetWidth - 16,
-          bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
+          left: maxWidth -
+              (basePosition -
+                  nearWidgetWidth +
+                  (nearWidgetWidth / 2) * (distance.abs() - 3)) -
+              farWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
         );
       }
-    }else{
-        if (distance > 0){
-          return (
-            left: basePosition + ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4),
-            bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
-          );
-        }else{
-          return (
-            left: maxWidth - (basePosition + ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4)) - farWidgetWidth - 16,
-            bottom: verticalBasePosition + ((centerWidgetHeight / factor) * (distance.abs()))
-          );
-        }
+    } else {
+      if (distance > 0) {
+        return (
+          left: basePosition +
+              ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4),
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
+        );
+      } else {
+        return (
+          left: maxWidth -
+              (basePosition +
+                  ((centerWidgetWidth - farWidgetWidth) / 2) *
+                      (distance.abs() - 4)) -
+              farWidgetWidth -
+              16,
+          bottom: verticalBasePosition +
+              ((centerWidgetHeight / factor) * (distance.abs()))
+        );
+      }
     }
   }
 
-double getCardWidth(int index) {
-  final double centerWidgetWidth = maxWidth / 3.5;
-  final double nearWidgetWidth = centerWidgetWidth / 5 * 4.5;
-  final double farWidgetWidth = centerWidgetWidth / 5 * 3.5;
+  ({double left, double bottom}) getCardPosition1(int index) {
+    final double center = maxWidth / 2;
+    final double centerWidgetWidth = maxWidth / 4;
+    final double basePosition = center - centerWidgetWidth / 2;
 
-  // Calculate the raw distance
-  double rawDistance = centerIndex - index;
+    final double centerWidgetHeight = maxHeight / 2.5;
 
-  // Calculate the shortest distance considering the wrap-around
-  double distance = rawDistance % cards.length;
+    double rawDistance = index - centerIndex;
+    double distance = rawDistance % cards.length;
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
 
-  if (distance > cards.length / 2) {
-    distance -= cards.length;
-  } else if (distance <= -cards.length / 2) {
-    distance += cards.length;
+    final double absDistance = distance.abs();
+    const double maxVisibleDistance =
+        3.0; // Adjust for the number of visible side cards
+
+    // Normalize distance for smoother calculations
+    double normalizedDistance =
+        (absDistance / maxVisibleDistance).clamp(0.0, 1.0);
+
+    // --- Horizontal Positioning (Curvature) ---
+    double horizontalOffset =
+        maxWidth / 3 * math.sin(normalizedDistance * math.pi / 2);
+    if (distance < 0) {
+      horizontalOffset = -horizontalOffset;
+    }
+    final double leftPosition = basePosition -
+        horizontalOffset *
+            (1 + 0.2 * normalizedDistance); // Add a bit more push to the sides
+
+    // --- Vertical Positioning ---
+    double verticalOffset =
+        maxHeight / 8 * math.cos((normalizedDistance + 1) * math.pi);
+    final double bottomPosition =
+        (maxHeight / 2 - centerWidgetHeight / 2) / 2 + verticalOffset;
+    return (left: leftPosition, bottom: bottomPosition);
   }
 
-  final double absDistance = distance.abs(); // Use the absolute shortest distance
+  ({double left, double bottom}) getCardPosition2(int index) {
+    final double center = maxWidth / 2;
+    final double centerWidgetWidth = maxWidth / 4;
+    final double basePosition = center - centerWidgetWidth / 2;
 
-  if (absDistance >= 0.0 && absDistance < 1.0) {
-    return centerWidgetWidth -
-        (centerWidgetWidth - nearWidgetWidth) * (absDistance - absDistance.floor());
-  } else if (absDistance >= 1.0 && absDistance < 2.0) {
-    return nearWidgetWidth -
-        (nearWidgetWidth - farWidgetWidth) * (absDistance - absDistance.floor());
-  } else {
-    return farWidgetWidth;
+    final double centerWidgetHeight = maxHeight / 2.5;
+
+    double rawDistance = index - centerIndex;
+    double distance = rawDistance % cards.length;
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
+
+    final double absDistance = distance.abs();
+    final double maxVisibleDistance = 6.0; // Increased to show more cards
+
+    double normalizedDistance =
+        (absDistance / maxVisibleDistance).clamp(0.0, 1.0);
+
+    // --- Horizontal Positioning (More Circular) ---
+    double horizontalOffset =
+        maxWidth / 2.5 * math.sin(normalizedDistance * math.pi / 2);
+    if (distance < 0) {
+      horizontalOffset = -horizontalOffset;
+    }
+    final double leftPosition =
+        basePosition - horizontalOffset * (1 + 0.1 * normalizedDistance);
+
+    // --- Vertical Positioning (Smoother Circular Arc) ---
+    double verticalOffset =
+        maxHeight / 2 * (0.5 - math.cos(normalizedDistance * math.pi) / 2);
+    final double bottomPosition =
+        (maxHeight / 2 - centerWidgetHeight / 2) / 2 + verticalOffset;
+
+    return (left: leftPosition, bottom: bottomPosition);
   }
-}
+
+  // -.---.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+
+  ({double left, double bottom}) getCardPosition3(int index) {
+    final double center = maxWidth / 2;
+    final double centerWidgetWidth = maxWidth / 4;
+    final double basePosition = center - centerWidgetWidth / 2;
+    final double centerWidgetHeight = maxHeight / 2.5;
+
+    double rawDistance = index - centerIndex;
+    double distance = rawDistance % cards.length;
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
+
+    final double absDistance = distance.abs();
+    final double maxVisibleDistance = cards.length.toDouble();
+    //final double maxVisibleDistance = 6.0;
+
+    double normalizedDistance =
+        (absDistance / maxVisibleDistance).clamp(0.0, 1.0);
+
+    // --- Horizontal Positioning (More Circular) ---
+    double horizontalOffset =
+        maxWidth / 2.5 * math.sin(normalizedDistance * math.pi * 2);
+    if (distance < 0) {
+      horizontalOffset = -horizontalOffset;
+    }
+    final double leftPosition =
+        basePosition - horizontalOffset * (1 + 0.1 * normalizedDistance);
+
+    double verticalOffset;
+    double verticalScale = maxHeight / 2;
+    double transitionPoint =
+        0.5; // Adjust this to control where the transition happens
+
+    if (normalizedDistance <= transitionPoint) {
+      // Sine arc for closer cards
+      verticalOffset = verticalScale * math.sin(normalizedDistance * math.pi);
+    } else {
+      // Cosine arc for further cards (slanting upwards)
+      double adjustedNormalizedDistance =
+          (normalizedDistance - transitionPoint) / (1 - transitionPoint);
+      verticalOffset =
+          verticalScale * (math.cos(adjustedNormalizedDistance * math.pi));
+    }
+
+    final double bottomPosition =
+        (maxHeight / 2 - centerWidgetHeight / 2) / 2 + verticalOffset;
+
+    return (left: leftPosition, bottom: bottomPosition);
+  }
+
+  double getCardWidth(int index) {
+    final double centerWidgetWidth = maxWidth / 3.5;
+    final double nearWidgetWidth = centerWidgetWidth / 5 * 4.5;
+    final double farWidgetWidth = centerWidgetWidth / 5 * 3.5;
+
+    // Calculate the raw distance
+    double rawDistance = centerIndex - index;
+
+    // Calculate the shortest distance considering the wrap-around
+    double distance = rawDistance % cards.length;
+
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
+
+    final double absDistance =
+        distance.abs(); // Use the absolute shortest distance
+
+    if (absDistance >= 0.0 && absDistance < 1.0) {
+      return centerWidgetWidth -
+          (centerWidgetWidth - nearWidgetWidth) *
+              (absDistance - absDistance.floor());
+    } else if (absDistance >= 1.0 && absDistance < 2.0) {
+      return nearWidgetWidth -
+          (nearWidgetWidth - farWidgetWidth) *
+              (absDistance - absDistance.floor());
+    } else {
+      return farWidgetWidth;
+    }
+  }
 
   Widget _buildItem(CardModel item) {
     final int index = item.id;
     final width = getCardWidth(index);
     final height = maxHeight - 20 * (getCircularDistance(index)).abs();
-    final position = getCardPosition(index);
+    final position = getCardPosition3(index);
     final verticalPadding = width * 0.05 * (getCircularDistance(index)).abs();
 
     return Positioned(
       left: position.left,
       bottom: position.bottom,
-      
-        child: Stack(
-          children: [
-            Container(
-              width: width.toDouble(),
-              padding: EdgeInsets.symmetric(vertical: verticalPadding),
-              height: height > 0 ? height : 0,
-              child: item.child,
-            ),
-            Container(
-              width: width.toDouble(),
-              padding: EdgeInsets.symmetric(vertical: verticalPadding),
-              height: height > 0 ? height : 0,
-              child: ClipRRect(
-                child: BackdropFilter(
-                  filter: getFilter(obscure, index),
-                  child: Container(),
-                ),
+      child: Stack(
+        children: [
+          Container(
+            width: width.toDouble(),
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            height: height > 0 ? height : 0,
+            child: item.child,
+          ),
+          Container(
+            width: width.toDouble(),
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            height: height > 0 ? height : 0,
+            child: ClipRRect(
+              child: BackdropFilter(
+                filter: getFilter(obscure, index),
+                child: Container(),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -290,12 +465,16 @@ double getCardWidth(int index) {
         distance += cards.length;
       }
 
-      widgets[i].wrappedDistance = distance.abs(); // Store the wrapped absolute distance
+      widgets[i].wrappedDistance =
+          distance.abs(); // Store the wrapped absolute distance
 
-      if (widgets[i].id == centerIndex.round()) { // Use rounded centerIndex for comparison
-        widgets[i].zIndex = widgets.length.toDouble() - widgets[i].wrappedDistance;
+      if (widgets[i].id == centerIndex.round()) {
+        // Use rounded centerIndex for comparison
+        widgets[i].zIndex =
+            widgets.length.toDouble() - widgets[i].wrappedDistance;
       } else {
-        widgets[i].zIndex = widgets.length.toDouble() - widgets[i].wrappedDistance - 1;
+        widgets[i].zIndex =
+            widgets.length.toDouble() - widgets[i].wrappedDistance - 1;
       }
     }
 
@@ -311,12 +490,12 @@ double getCardWidth(int index) {
   }
 
   ImageFilter getFilter(double obscure, int index) {
-        // Calculate the raw distance
+    // Calculate the raw distance
     double rawDistance = (centerIndex - index).abs();
 
     // Calculate the shortest distance considering the wrap-around
     double distance = rawDistance % cards.length;
-    
+
     if (distance > cards.length / 2) {
       distance -= cards.length;
     } else if (distance <= -cards.length / 2) {
@@ -339,19 +518,18 @@ double getCardWidth(int index) {
     );
   }
 
-  double getCircularDistance(int index){
-      // Calculate the raw distance
+  double getCircularDistance(int index) {
+    // Calculate the raw distance
     double rawDistance = (centerIndex - index).abs();
-            
+
     // Calculate the shortest distance considering the wrap-around
     double distance = rawDistance % cards.length;
-    
+
     if (distance > cards.length / 2) {
       distance -= cards.length;
     } else if (distance <= -cards.length / 2) {
       distance += cards.length;
     }
     return distance;
-
   }
 }
