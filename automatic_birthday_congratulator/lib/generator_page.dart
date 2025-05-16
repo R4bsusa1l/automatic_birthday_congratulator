@@ -4,6 +4,8 @@ import 'package:automatic_birthday_congratulator/app_state.dart';
 import 'package:automatic_birthday_congratulator/display_carousel.dart';
 
 class GeneratorPage extends StatelessWidget {
+  const GeneratorPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
