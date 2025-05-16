@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'card.dart';
+import 'dart:math' as math;
 
 class InfiniteOverlappedCarousel extends StatefulWidget {
   final List<Widget> widgets;
@@ -47,15 +48,25 @@ class InfiniteOverlappedCarouselState
           return GestureDetector(
             onPanUpdate: (details) {
               setState(() {
-                var indx = currentIndex - details.delta.dx * 0.02;
-                if (indx >= 1 && indx <= widget.widgets.length - 3) {
-                  currentIndex = indx;
+                currentIndex -= details.delta.dx * 0.02;
+                if (currentIndex < 0) {
+                  currentIndex += widget.widgets.length;
+                } else if (currentIndex >= widget.widgets.length) {
+                  currentIndex -= widget.widgets.length;
                 }
               });
             },
             onPanEnd: (details) {
               setState(() {
-                currentIndex = currentIndex.ceil().toDouble();
+                // Snap to the nearest integer index
+                currentIndex = currentIndex.roundToDouble();
+
+                // Wrap around logic for snapping
+                if (currentIndex < 0) {
+                  currentIndex += widget.widgets.length;
+                } else if (currentIndex >= widget.widgets.length) {
+                  currentIndex -= widget.widgets.length;
+                }
               });
             },
             child: OverlappedCarouselCardItems(
@@ -98,146 +109,99 @@ class OverlappedCarouselCardItems extends StatelessWidget {
   });
 
   ({double left, double bottom}) getCardPosition(int index) {
-    final double center = maxWidth / 2;
-    final double centerWidgetWidth = maxWidth / 4;
-    final double basePosition = center - centerWidgetWidth / 2;
-    final distance = centerIndex - index;
+    final int numberOfCards = cards.length;
+    final double rotationCenterX = maxWidth / 2;
+    final double rotationCenterY =
+        maxHeight * 0.6; // Adjust vertical center as needed
+    final double ellipseSemiMajorAxis =
+        maxWidth / 3; // Scale 'a' to fit your layout
+    final double ellipseSemiMinorAxis =
+        ellipseSemiMajorAxis * math.sqrt(2 / 3) / 2; // Scale 'b' proportionally
 
-    final double nearWidgetWidth = centerWidgetWidth / 5 * 4;
-    final double farWidgetWidth = centerWidgetWidth / 5 * 3;
-    final double nearBackWidgetWidth = centerWidgetWidth / 5 * 2;
-    final double farBackWidgetWidth = centerWidgetWidth / 5 * 1.25;
-    final double centerBackWidgetWidth = centerWidgetWidth / 5;
+    // Map index to the parameter t (0 to 2*pi)
+    double t = (2 * math.pi * index / numberOfCards) -
+        (centerIndex * 2 * math.pi / numberOfCards) -
+        math.pi / 2;
 
-    final double verticalCenter = maxHeight / 2;
-    final double centerWidgetHeight = maxHeight / 2.5;
-    final double verticalBasePosition =
-        (verticalCenter - centerWidgetHeight) / 8;
+    // Parametric equations for the ellipse (no rotation)
+    double x = ellipseSemiMajorAxis * math.cos(t);
+    double y = ellipseSemiMinorAxis * math.sin(t);
 
-    const double factor = 4.75; // make smaller for steeper incline
-
-    if (distance == 0) {
-      return (
-        left: basePosition,
-        bottom: verticalBasePosition,
-      );
-    } else if (distance.abs() > 0.0 && distance.abs() <= 1.0) {
-      if (distance > 0) {
-        return (
-          left: basePosition - nearWidgetWidth * distance.abs(),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      } else {
-        return (
-          left: maxWidth -
-              (basePosition - nearWidgetWidth * distance.abs()) -
-              nearWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      }
-    } else if (distance.abs() >= 1.0 && distance.abs() <= 2.0) {
-      if (distance > 0) {
-        return (
-          left: basePosition -
-              nearWidgetWidth -
-              (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      } else {
-        return (
-          left: maxWidth -
-              (basePosition -
-                  nearWidgetWidth -
-                  (nearWidgetWidth - farWidgetWidth) * (distance.abs() - 1)) -
-              farWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      }
-    } else if (distance.abs() > 2.0 && distance.abs() <= 3.0) {
-      if (distance > 0) {
-        return (
-          left: basePosition -
-              nearWidgetWidth +
-              (farBackWidgetWidth - centerBackWidgetWidth) *
-                  (distance.abs() - 2),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      } else {
-        return (
-          left: maxWidth -
-              (basePosition -
-                  nearWidgetWidth +
-                  (farWidgetWidth - nearBackWidgetWidth) *
-                      (distance.abs() - 2)) -
-              nearBackWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      }
-    } else if (distance.abs() > 3.0 && distance.abs() <= 4.0) {
-      if (distance > 0) {
-        return (
-          left: basePosition -
-              nearWidgetWidth +
-              (nearWidgetWidth / 2) * (distance.abs() - 3),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      } else {
-        return (
-          left: maxWidth -
-              (basePosition -
-                  nearWidgetWidth +
-                  (nearWidgetWidth / 2) * (distance.abs() - 3)) -
-              farWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      }
-    } else {
-      if (distance > 0) {
-        return (
-          left: basePosition +
-              ((centerWidgetWidth - farWidgetWidth) / 2) * (distance.abs() - 4),
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      } else {
-        return (
-          left: maxWidth -
-              (basePosition +
-                  ((centerWidgetWidth - farWidgetWidth) / 2) *
-                      (distance.abs() - 4)) -
-              farWidgetWidth -
-              16,
-          bottom: verticalBasePosition +
-              ((centerWidgetHeight / factor) * (distance.abs()))
-        );
-      }
+    // Position the card based on the elliptical path
+    double leftPosition = rotationCenterX + x - (getCardWidth(index) / 2);
+    double bottomPosition =
+        rotationCenterY + y - (maxHeight / 3); // Anchor from the bottom
+    if (math.sin(t) >= ((math.pi / 2) - 0.15) &&
+        math.sin(t) <= ((math.pi / 2) + 0.15)) {
+      // Adjust the bottom position for the topmost card
+      bottomPosition = maxHeight * 0.5;
     }
+
+    return (left: leftPosition, bottom: bottomPosition);
+  }
+
+  ({double left, double bottom}) getCardPosition1(int index) {
+    final int numberOfCards = cards.length;
+    final double rotationCenterX = maxWidth / 2;
+    final double rotationCenterY =
+        maxHeight * 0.6; // Adjust vertical center as needed
+    final double ellipseSemiMajorAxis =
+        maxWidth / 3; // Scale 'a' to fit your layout
+    final double ellipseSemiMinorAxis =
+        ellipseSemiMajorAxis * math.sqrt(2 / 3) / 2; // Scale 'b' proportionally
+    double depthScaleFactor =
+        0.25; // Adjust to control the height increase of the back cards
+
+    // Map index to the parameter t (0 to 2*pi) and apply a phase shift for 90-degree clockwise rotation
+    double t = (2 * math.pi * index / numberOfCards) -
+        (centerIndex * 2 * math.pi / numberOfCards) -
+        math.pi / 2;
+
+    // Parametric equations for the ellipse (no rotation)
+    double x = ellipseSemiMajorAxis * math.cos(t);
+    double y = ellipseSemiMinorAxis * math.sin(t);
+
+    // Calculate a depth-based vertical offset
+    double depthOffset = depthScaleFactor * math.sin(t) * (maxHeight / 8);
+
+    // Position the card based on the elliptical path with depth offset
+    double leftPosition = rotationCenterX + x - (getCardWidth(index) / 2);
+    double bottomPosition = rotationCenterY +
+        y -
+        (maxHeight / 3) +
+        depthOffset; // Subtract offset to move back cards higher
+
+    return (left: leftPosition, bottom: bottomPosition);
   }
 
   double getCardWidth(int index) {
-    final double distance = (centerIndex - index).abs();
     final double centerWidgetWidth = maxWidth / 3.5;
     final double nearWidgetWidth = centerWidgetWidth / 5 * 4.5;
     final double farWidgetWidth = centerWidgetWidth / 5 * 3.5;
 
-    if (distance >= 0.0 && distance < 1.0) {
+    // Calculate the raw distance
+    double rawDistance = centerIndex - index;
+
+    // Calculate the shortest distance considering the wrap-around
+    double distance = rawDistance % cards.length;
+
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
+
+    final double absDistance =
+        distance.abs(); // Use the absolute shortest distance
+
+    if (absDistance >= 0.0 && absDistance < 1.0) {
       return centerWidgetWidth -
-          (centerWidgetWidth - nearWidgetWidth) * (distance - distance.floor());
-    } else if (distance >= 1.0 && distance < 2.0) {
+          (centerWidgetWidth - nearWidgetWidth) *
+              (absDistance - absDistance.floor());
+    } else if (absDistance >= 1.0 && absDistance < 2.0) {
       return nearWidgetWidth -
-          (nearWidgetWidth - farWidgetWidth) * (distance - distance.floor());
+          (nearWidgetWidth - farWidgetWidth) *
+              (absDistance - absDistance.floor());
     } else {
       return farWidgetWidth;
     }
@@ -246,9 +210,9 @@ class OverlappedCarouselCardItems extends StatelessWidget {
   Widget _buildItem(CardModel item) {
     final int index = item.id;
     final width = getCardWidth(index);
-    final height = maxHeight - 20 * (centerIndex - index).abs();
-    final position = getCardPosition(index);
-    final verticalPadding = width * 0.05 * (centerIndex - index).abs();
+    final height = maxHeight - 20 * (getCircularDistance(index)).abs();
+    final position = getCardPosition1(index);
+    final verticalPadding = width * 0.05 * (getCircularDistance(index)).abs();
 
     return Positioned(
       left: position.left,
@@ -277,38 +241,60 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     );
   }
 
-  ImageFilter getFilter(double obscure, int index) {
-    final distance = (centerIndex - index).abs();
-    return ImageFilter.blur(
-      sigmaX: 5.0 * obscure * distance,
-      sigmaY: 5.0 * obscure * distance,
-    );
-  }
-
   List<Widget> _sortedStackWidgets(List<CardModel> widgets) {
     for (int i = 0; i < widgets.length; i++) {
-      double distance = (centerIndex - widgets[i].id).abs();
+      // Calculate the raw distance
+      double rawDistance = centerIndex - widgets[i].id;
 
-      if (widgets[i].id == centerIndex) {
-        widgets[i].zIndex = widgets.length.toDouble() - distance;
+      // Calculate the shortest distance considering the wrap-around
+      double distance = rawDistance % cards.length;
+
+      if (distance > cards.length / 2) {
+        distance -= cards.length;
+      } else if (distance <= -cards.length / 2) {
+        distance += cards.length;
+      }
+
+      widgets[i].wrappedDistance =
+          distance.abs(); // Store the wrapped absolute distance
+
+      if (widgets[i].id == centerIndex.round()) {
+        // Use rounded centerIndex for comparison
+        widgets[i].zIndex =
+            widgets.length.toDouble() - widgets[i].wrappedDistance;
       } else {
-        if (distance > 0) {
-          widgets[i].zIndex = widgets.length.toDouble() - distance - 1;
-        } else {
-          widgets[i].zIndex = widgets.length.toDouble() - distance;
-        }
+        widgets[i].zIndex =
+            widgets.length.toDouble() - widgets[i].wrappedDistance - 1;
       }
     }
 
     widgets.sort((a, b) => a.zIndex.compareTo(b.zIndex));
     return widgets.map((e) {
-      double distance = (centerIndex - e.id).abs();
-      if (distance >= 0 && distance <= 5) {
+      // Use the stored wrapped absolute distance for filtering
+      if (e.wrappedDistance >= 0 && e.wrappedDistance <= 5) {
         return _buildItem(e);
       } else {
         return Container();
       }
     }).toList();
+  }
+
+  ImageFilter getFilter(double obscure, int index) {
+    // Calculate the raw distance
+    double rawDistance = (centerIndex - index).abs();
+
+    // Calculate the shortest distance considering the wrap-around
+    double distance = rawDistance % cards.length;
+
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
+    return ImageFilter.blur(
+      sigmaX: 5.0 * obscure * distance,
+      sigmaY: 5.0 * obscure * distance,
+    );
   }
 
   @override
@@ -320,5 +306,20 @@ class OverlappedCarouselCardItems extends StatelessWidget {
         children: _sortedStackWidgets(cards),
       ),
     );
+  }
+
+  double getCircularDistance(int index) {
+    // Calculate the raw distance
+    double rawDistance = (centerIndex - index).abs();
+
+    // Calculate the shortest distance considering the wrap-around
+    double distance = rawDistance % cards.length;
+
+    if (distance > cards.length / 2) {
+      distance -= cards.length;
+    } else if (distance <= -cards.length / 2) {
+      distance += cards.length;
+    }
+    return distance;
   }
 }

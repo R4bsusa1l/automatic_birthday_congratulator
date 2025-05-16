@@ -1,13 +1,9 @@
 import 'package:flutter/cupertino.dart';
-
 class CardModel {
   final int id;
-  double zIndex;
-  final Widget? child;
+  final Widget child;
+  double zIndex = 0.0;
+  double wrappedDistance = 0.0; // Added this line
 
-  CardModel({
-    required this.id,
-    this.zIndex = 0.0,
-    this.child,
-  });
+  CardModel({required this.id, required this.child});
 }
