@@ -119,7 +119,8 @@ class OverlappedCarouselCardItems extends StatelessWidget {
         ellipseSemiMajorAxis * math.sqrt(2 / 3) / 2; // Scale 'b' proportionally
 
     // Map index to the parameter t (0 to 2*pi)
-    double t = (2 * math.pi * index / numberOfCards) -
+    double t =
+        (2 * math.pi * index / numberOfCards) -
         (centerIndex * 2 * math.pi / numberOfCards) -
         math.pi / 2;
 
@@ -153,7 +154,8 @@ class OverlappedCarouselCardItems extends StatelessWidget {
         0.25; // Adjust to control the height increase of the back cards
 
     // Map index to the parameter t (0 to 2*pi) and apply a phase shift for 90-degree clockwise rotation
-    double t = (2 * math.pi * index / numberOfCards) -
+    double t =
+        (2 * math.pi * index / numberOfCards) -
         (centerIndex * 2 * math.pi / numberOfCards) -
         math.pi / 2;
 
@@ -166,7 +168,8 @@ class OverlappedCarouselCardItems extends StatelessWidget {
 
     // Position the card based on the elliptical path with depth offset
     double leftPosition = rotationCenterX + x - (getCardWidth(index) / 2);
-    double bottomPosition = rotationCenterY +
+    double bottomPosition =
+        rotationCenterY +
         y -
         (maxHeight / 3) +
         depthOffset; // Subtract offset to move back cards higher

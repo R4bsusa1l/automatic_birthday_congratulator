@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:automatic_birthday_congratulator/database.dart';
-import 'app_state.dart';
+import '../app_state.dart';
 import 'package:provider/provider.dart';
 
 class DisplayBirthdayMessages extends StatefulWidget {
@@ -65,7 +65,7 @@ class _DataTableSelectMessageState extends State<DataTableSelectMessage> {
               }
               // Even rows will have a grey color.
               if (index.isEven) {
-                return Colors.grey.withOpacity(0.3);
+                return Colors.grey..withOpacity(0.3);
               }
               return null; // Use default value for other states and odd rows.
             }),
