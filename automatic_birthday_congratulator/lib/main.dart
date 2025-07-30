@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:automatic_birthday_congratulator/data_entry_page.dart';
-import 'package:automatic_birthday_congratulator/favorites_page.dart';
-import 'package:automatic_birthday_congratulator/generator_page.dart';
+import 'package:automatic_birthday_congratulator/birthday_entry/data_entry_page.dart';
+import 'package:automatic_birthday_congratulator/homepage.dart';
 import 'package:automatic_birthday_congratulator/app_state.dart';
 
 void main() {
@@ -61,9 +60,9 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = GeneratorPage();
+        page = HomePage();
       case 1:
-        page = FavoritesPage();
+        page = HomePage();
       case 2:
         page = DataEntryPage();
       default:

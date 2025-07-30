@@ -1,8 +1,8 @@
-import 'package:automatic_birthday_congratulator/display_birthday_messages.dart';
+import 'package:automatic_birthday_congratulator/birthday_entry/display_birthday_messages.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:automatic_birthday_congratulator/enter_birthdate.dart';
-import 'app_state.dart';
+import 'package:automatic_birthday_congratulator/birthday_entry/enter_birthdate.dart';
+import '../app_state.dart';
 
 class DataEntryPage extends StatefulWidget {
   @override
