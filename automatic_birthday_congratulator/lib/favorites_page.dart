@@ -32,7 +32,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       body: Center(
         //Wrap the OverlappedCarousel widget with SizedBox to fix a height. No need to specify width.
         child: SizedBox(
-          height: min(screenWidth / 3.3 * (16 / 9), screenHeight * .9),
+          height: min(screenWidth / 3.3 * (16 / 9), screenHeight * 0.70),
           child: InfiniteOverlappedCarousel(
             widgets: widgets, //List of widgets
             currentIndex: widgets.length ~/ 2, //Current index of the carousel
