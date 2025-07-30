@@ -112,7 +112,7 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     final int numberOfCards = cards.length;
     final double rotationCenterX = maxWidth / 2;
     final double rotationCenterY =
-        maxHeight * 0.6; // Adjust vertical center as needed
+        maxHeight / 2; // Adjust vertical center as needed
     final double ellipseSemiMajorAxis =
         maxWidth / 3; // Scale 'a' to fit your layout
     final double ellipseSemiMinorAxis =

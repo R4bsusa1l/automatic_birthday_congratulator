@@ -37,6 +37,8 @@ class _FavoritesPageState extends State<HomePage> {
       //Wrap with Center to place the carousel center of the screen
       body: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             //Wrap the OverlappedCarousel widget with SizedBox to fix a height. No need to specify width.
             SizedBox(
@@ -54,6 +56,7 @@ class _FavoritesPageState extends State<HomePage> {
                 skewAngle: 0.1,
               ),
             ),
+            const SizedBox(height: 40),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [

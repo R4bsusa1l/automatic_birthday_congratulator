@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 import 'dart:math';
-import 'infinite_overlapped_carousel.dart';
+import 'infi_overl_car/infinite_overlapped_carousel.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -20,7 +20,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
         fit: BoxFit.fill,
       ),
     ),
-  ); 
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
       body: Center(
         //Wrap the OverlappedCarousel widget with SizedBox to fix a height. No need to specify width.
         child: SizedBox(
-          height: min(screenWidth / 3.3 * (16 / 9), screenHeight * 0.70),
+          height:
+              screenHeight, //min(screenWidth / 3.3 * (16 / 9), screenHeight),
+          width: screenWidth,
           child: InfiniteOverlappedCarousel(
             widgets: widgets, //List of widgets
             currentIndex: widgets.length ~/ 2, //Current index of the carousel
