@@ -131,7 +131,7 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     // Position the card based on the elliptical path
     double leftPosition = rotationCenterX + x - (getCardWidth(index) / 2);
     double bottomPosition =
-        rotationCenterY + y - (maxHeight / 3); // Anchor from the bottom
+        rotationCenterY + y - (maxHeight * 0.95); // Anchor from the bottom
     if (math.sin(t) >= ((math.pi / 2) - 0.15) &&
         math.sin(t) <= ((math.pi / 2) + 0.15)) {
       // Adjust the bottom position for the topmost card
@@ -145,7 +145,7 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     final int numberOfCards = cards.length;
     final double rotationCenterX = maxWidth / 2;
     final double rotationCenterY =
-        maxHeight * 0.6; // Adjust vertical center as needed
+        maxHeight * 0.55; // Adjust vertical center as needed
     final double ellipseSemiMajorAxis =
         maxWidth / 3; // Scale 'a' to fit your layout
     final double ellipseSemiMinorAxis =
@@ -171,7 +171,7 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     double bottomPosition =
         rotationCenterY +
         y -
-        (maxHeight / 3) +
+        (maxHeight * 0.4) +
         depthOffset; // Subtract offset to move back cards higher
 
     return (left: leftPosition, bottom: bottomPosition);
