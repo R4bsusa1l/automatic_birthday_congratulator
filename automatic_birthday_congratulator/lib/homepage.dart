@@ -29,6 +29,8 @@ class _FavoritesPageState extends State<HomePage> {
     var screenWidth = MediaQuery.of(context).size.width;
     var screenHeight = MediaQuery.of(context).size.height;
     var appState = Provider.of<MyAppState>(context);
+    var constrainedWidth =
+        screenWidth > screenHeight ? screenHeight : screenWidth;
 
     //final theme = Theme.of(context);
 
@@ -42,6 +44,7 @@ class _FavoritesPageState extends State<HomePage> {
           children: [
             //Wrap the OverlappedCarousel widget with SizedBox to fix a height. No need to specify width.
             SizedBox(
+              width: constrainedWidth,
               height: min(screenWidth / 3.3 * (16 / 9), screenHeight * .9),
               child: InfiniteOverlappedCarousel(
                 widgets: widgets, //List of widgets

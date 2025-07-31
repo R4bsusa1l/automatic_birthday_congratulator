@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'card.dart';
 import 'dart:math' as math;
 
-class InfiniteOverlappedCarousel extends StatefulWidget {
+class InfiniteOverlappedInvertedCarousel extends StatefulWidget {
   final List<Widget> widgets;
   final Function(int) onClicked;
   final int? currentIndex;
   final double obscure;
   final double skewAngle;
 
-  const InfiniteOverlappedCarousel({
+  const InfiniteOverlappedInvertedCarousel({
     super.key,
     required this.widgets,
     required this.onClicked,
@@ -23,12 +23,12 @@ class InfiniteOverlappedCarousel extends StatefulWidget {
   });
 
   @override
-  InfiniteOverlappedCarouselState createState() =>
-      InfiniteOverlappedCarouselState();
+  InfiniteOverlappedInvertedCarouselState createState() =>
+      InfiniteOverlappedInvertedCarouselState();
 }
 
-class InfiniteOverlappedCarouselState
-    extends State<InfiniteOverlappedCarousel> {
+class InfiniteOverlappedInvertedCarouselState
+    extends State<InfiniteOverlappedInvertedCarousel> {
   double currentIndex = 2;
 
   @override
@@ -80,7 +80,6 @@ class InfiniteOverlappedCarouselState
               onClicked: widget.onClicked,
               obscure: widget.obscure,
               skewAngle: widget.skewAngle,
-              context: context,
             ),
           );
         },
@@ -97,7 +96,6 @@ class OverlappedCarouselCardItems extends StatelessWidget {
   final double maxWidth;
   final double obscure;
   final double skewAngle;
-  final BuildContext context;
 
   const OverlappedCarouselCardItems({
     super.key,
@@ -108,21 +106,48 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     required this.onClicked,
     required this.obscure,
     required this.skewAngle,
-    required this.context,
   });
 
   ({double left, double bottom}) getCardPosition(int index) {
     final int numberOfCards = cards.length;
-    double currentMaxWidth = maxWidth;
-    final double rotationCenterX = currentMaxWidth / 2;
+    final double rotationCenterX = maxWidth / 2;
+    final double rotationCenterY =
+        maxHeight / 2; // Adjust vertical center as needed
+    final double ellipseSemiMajorAxis =
+        maxWidth / 3; // Scale 'a' to fit your layout
+    final double ellipseSemiMinorAxis =
+        ellipseSemiMajorAxis * math.sqrt(2 / 3) / 2; // Scale 'b' proportionally
+
+    // Map index to the parameter t (0 to 2*pi)
+    double t =
+        (2 * math.pi * index / numberOfCards) -
+        (centerIndex * 2 * math.pi / numberOfCards) -
+        math.pi / 2;
+
+    // Parametric equations for the ellipse (no rotation)
+    double x = ellipseSemiMajorAxis * math.cos(t);
+    double y = ellipseSemiMinorAxis * math.sin(t);
+
+    // Position the card based on the elliptical path
+    double leftPosition = rotationCenterX + x - (getCardWidth(index) / 2);
+    double bottomPosition =
+        rotationCenterY + y - (maxHeight * 0.95); // Anchor from the bottom
+    if (math.sin(t) >= ((math.pi / 2) - 0.15) &&
+        math.sin(t) <= ((math.pi / 2) + 0.15)) {
+      // Adjust the bottom position for the topmost card
+      bottomPosition = maxHeight * 0.5;
+    }
+
+    return (left: leftPosition, bottom: bottomPosition);
+  }
+
+  ({double left, double bottom}) getCardPosition1(int index) {
+    final int numberOfCards = cards.length;
+    final double rotationCenterX = maxWidth / 2;
     final double rotationCenterY =
         maxHeight * 0.55; // Adjust vertical center as needed
-    if (maxWidth > maxHeight * 1.5) {
-      // Adjust rotation center for wider layouts
-      currentMaxWidth = maxHeight; // Scale width for wider layouts
-    }
     final double ellipseSemiMajorAxis =
-        currentMaxWidth / 3; // Scale 'a' to fit your layout
+        maxWidth / 3; // Scale 'a' to fit your layout
     final double ellipseSemiMinorAxis =
         ellipseSemiMajorAxis * math.sqrt(2 / 3) / 2; // Scale 'b' proportionally
     double depthScaleFactor =
@@ -147,20 +172,13 @@ class OverlappedCarouselCardItems extends StatelessWidget {
         rotationCenterY +
         y -
         (maxHeight * 0.4) +
-        depthOffset // Subtract offset to move back cards higher
-        +
-        getCircularDistance(index); // offset for scalature
+        depthOffset; // Subtract offset to move back cards higher
 
     return (left: leftPosition, bottom: bottomPosition);
   }
 
   double getCardWidth(int index) {
-    double currentMaxWidth = maxWidth;
-    if (maxWidth > maxHeight * 1.5) {
-      // Adjust width for wider layouts
-      currentMaxWidth = maxHeight; // * 1.5; // Scale width for wider layouts
-    }
-    final double centerWidgetWidth = currentMaxWidth / 3.5;
+    final double centerWidgetWidth = maxWidth / 3.5;
     final double nearWidgetWidth = centerWidgetWidth / 5 * 4.5;
     final double farWidgetWidth = centerWidgetWidth / 5 * 3.5;
 
@@ -192,20 +210,11 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     }
   }
 
-  double getCardHeight(int index) {
-    double effectiveHeight =
-        maxHeight - 20 * (getCircularDistance(index)).abs();
-    double maxHeightByScreensize = MediaQuery.of(context).size.height * 0.4;
-    return effectiveHeight > maxHeightByScreensize
-        ? maxHeightByScreensize
-        : effectiveHeight;
-  }
-
   Widget _buildItem(CardModel item) {
     final int index = item.id;
     final width = getCardWidth(index);
-    final height = getCardHeight(index);
-    final position = getCardPosition(index);
+    final height = maxHeight - 20 * (getCircularDistance(index)).abs();
+    final position = getCardPosition1(index);
     final verticalPadding = width * 0.05 * (getCircularDistance(index)).abs();
 
     return Positioned(
