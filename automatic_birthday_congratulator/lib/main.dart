@@ -3,9 +3,24 @@ import 'package:provider/provider.dart';
 import 'package:automatic_birthday_congratulator/birthday_entry/data_entry_page.dart';
 import 'package:automatic_birthday_congratulator/homepage.dart';
 import 'package:automatic_birthday_congratulator/app_state.dart';
+import 'package:window_size/window_size.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Check if it's NOT a web application
+  if (!kIsWeb) {
+    // You may also want to check for desktop platforms specifically, but this is a good start.
+    // The window_size package is only for desktop anyway.
+
+    // Asynchronously set window properties
+    setWindowTitle('Automatic Birthday Congratulator');
+    setWindowMinSize(const Size(400, 400));
+    setWindowMaxSize(const Size(10000, 10000));
+  }
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

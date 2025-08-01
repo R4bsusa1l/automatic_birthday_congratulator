@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import 'dart:math';
 import 'infi_overl_car/infinite_overlapped_carousel.dart';
 
 class FavoritesPage extends StatefulWidget {

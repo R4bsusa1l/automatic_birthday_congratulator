@@ -37,50 +37,53 @@ class _FavoritesPageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: appState.currentColorScheme.primaryFixed,
       //Wrap with Center to place the carousel center of the screen
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            //Wrap the OverlappedCarousel widget with SizedBox to fix a height. No need to specify width.
-            SizedBox(
-              width: constrainedWidth,
-              height: min(screenWidth / 3.3 * (16 / 9), screenHeight * .9),
-              child: InfiniteOverlappedCarousel(
-                widgets: widgets, //List of widgets
-                currentIndex:
-                    widgets.length ~/ 2, //Current index of the carousel
-                onClicked: (index) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("You clicked at $index")),
-                  );
-                },
-                obscure: 0.4,
-                skewAngle: 0.1,
-              ),
-            ),
-            const SizedBox(height: 40),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: Icon(Icons.thumb_up),
-                  label: Text('Like'),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    appState.getNext();
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text("You clicked next")));
+      body: AspectRatio(
+        aspectRatio: 1,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              //Wrap the OverlappedCarousel widget with SizedBox to fix a height. No need to specify width.
+              SizedBox(
+                width: constrainedWidth,
+                height: min(screenWidth / 3.3 * (16 / 9), screenHeight * .9),
+                child: InfiniteOverlappedCarousel(
+                  widgets: widgets, //List of widgets
+                  currentIndex:
+                      widgets.length ~/ 2, //Current index of the carousel
+                  onClicked: (index) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("You clicked at $index")),
+                    );
                   },
-                  child: Text('Next'),
+                  obscure: 0.4,
+                  skewAngle: 0.1,
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 40),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: Icon(Icons.thumb_up),
+                    label: Text('Like'),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      appState.getNext();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("You clicked next")),
+                      );
+                    },
+                    child: Text('Next'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

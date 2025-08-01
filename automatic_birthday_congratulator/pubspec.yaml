@@ -39,6 +39,7 @@ dependencies:
   intl: ^0.18.0
   postgres: ^3.5.4
   overlapped_carousel: ^1.0.2
+  window_size: ^0.1.0
 
 
 dev_dependencies:

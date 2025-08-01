@@ -117,7 +117,7 @@ class OverlappedCarouselCardItems extends StatelessWidget {
     final double rotationCenterX = currentMaxWidth / 2;
     final double rotationCenterY =
         maxHeight * 0.55; // Adjust vertical center as needed
-    if (maxWidth > maxHeight * 1.5) {
+    if (maxWidth > maxHeight) {
       // Adjust rotation center for wider layouts
       currentMaxWidth = maxHeight; // Scale width for wider layouts
     }
@@ -156,7 +156,7 @@ class OverlappedCarouselCardItems extends StatelessWidget {
 
   double getCardWidth(int index) {
     double currentMaxWidth = maxWidth;
-    if (maxWidth > maxHeight * 1.5) {
+    if (maxWidth > maxHeight) {
       // Adjust width for wider layouts
       currentMaxWidth = maxHeight; // * 1.5; // Scale width for wider layouts
     }
